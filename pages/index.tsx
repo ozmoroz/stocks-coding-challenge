@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Container } from 'react-bootstrap';
+import { Col, Card, Container } from 'react-bootstrap';
+import Link from 'next/link';
 
 interface Props {
   name?: string;
@@ -14,10 +15,8 @@ interface StockData {
   id: number; // 109809;
   info: {
     data: {
+      description: string; // "Royal Bank of Canada operates as a diversified financial service company worldwide"
       logo_url: string; // "/api/company/image/NYSE:RY/logo"
-      main_header: string; // "https://images.simplywall.st/asset/company-cover/109809-main-header/1585186941972"
-      main_thumb: string; // "https://images.simplywall.st/asset/company-cover/109809-main-thumb/1585186601074"
-      url: string; // "www.rbc.com"
     };
   };
   name: string; // "Royal Bank of Canada"
@@ -38,6 +37,10 @@ interface StockData {
   ticker_symbol: string; // "RY"
   unique_symbol: string; // "TSX:RY"
 }
+
+/** Base URL of the site. We need this to suppolement relative URLs
+because we are serving this page from a different domain. */
+const BASE_URL = 'https://simplywall.st';
 
 const App: React.FunctionComponent<Props> = ({ name }) => {
   /**  Stocks data */
@@ -63,7 +66,7 @@ const App: React.FunctionComponent<Props> = ({ name }) => {
           ['is_fund', '=', false],
           ['aor', [['country_name', 'in', ['ca']]]],
         ]),
-      }), // body data type must match "Content-Type" header
+      }),
     })
       .then((response) => response.json())
       .then((data) => setStocks(data.data as StockData[]))
@@ -75,13 +78,26 @@ const App: React.FunctionComponent<Props> = ({ name }) => {
     <Container>
       <h1>The {name}</h1>
       {stocks.map((stock) => (
-        <Card style={{ width: '18rem' }}>
-          <Card.Img variant="top" src="holder.js/100px180" />
+        <Card key={stock.id}>
           <Card.Body>
-            <Card.Title>Card Title</Card.Title>
+            <Card.Title>
+              <Link href={`${BASE_URL}/${stock.canonical_url}`}>
+                {stock.unique_symbol}
+              </Link>
+            </Card.Title>
+            <Card.Subtitle>{stock.name}</Card.Subtitle>
+            <Card.Text>{stock.info.data.description}</Card.Text>
             <Card.Text>
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
+              Score:
+              <ul>
+                <li>value: {stock.score.data.value} </li>
+                <li>future: {stock.score.data.future}</li>
+                <li>past: {stock.score.data.past}</li>
+                <li>health: {stock.score.data.health}</li>
+                <li>income: {stock.score.data.income}</li>
+                <li>total: {stock.score.data.total}</li>
+              </ul>
+              <p>{stock.score.data.sentence}</p>
             </Card.Text>
             {/* <Button variant="primary">Go somewhere</Button> */}
           </Card.Body>
