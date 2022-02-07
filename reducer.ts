@@ -8,8 +8,12 @@ export const STOCKS_PER_PAGE = 12;
 export enum ActionType {
     /** "Load Mode" button clicked */
     LOAD_MORE = 'LOAD_MORE',
-    /** Fetching stocks fromt the API completed */
+    /** Started fetching stocks from the API */
+    FETCH_STARTED = 'FETCH_STARTED',
+    /** Fetching stocks from the API completed */
     FETCH_COMPLETED = 'FETCH_COMPLETED',
+    /** Error during fetching stocks from the API */
+    FETCH_ERROR = 'FETCH_ERROR',
     /** A new market selected from Countries drop-down */
     CHANGE_COUNTRY = 'CHANGE_COUNTRY',
     /** Use changed the market cap order (Ascending / descending) */
@@ -28,6 +32,10 @@ interface BaseAction<T> {
   type ChangeCountryAction = BaseAction<string>;
   /** An action to change the sort order. Payload is asc(ending) or desc(ending) */
   type ChangeOrderAction = BaseAction<'asc' | 'desc'>;
+  /** An action to that fires when stock fetching from the API is started */
+  type FetchStartedAction = BaseAction<void>;
+    /** An action to that fires when stock fetching from the API resulted in an error */
+  type FetchErrorAction = BaseAction<Error>;
   /** An action to that fires when stock fetching from the API is completed */
   type FetchCompletedAction = BaseAction<StockData[]>;
   
@@ -35,6 +43,8 @@ interface BaseAction<T> {
   type Action =
     | LoadMoreAction
     | ChangeCountryAction
+    | FetchStartedAction
+    | FetchErrorAction
     | FetchCompletedAction
     | ChangeOrderAction;
 
@@ -56,12 +66,27 @@ interface BaseAction<T> {
   ): action is ChangeCountryAction {
     return action.type === ActionType.CHANGE_COUNTRY;
   }
+
+  /** A type predicate to tell if `action` is a `FetchStartedAction` */
+  function isFetchStartedAction(
+    action: Action
+  ): action is FetchCompletedAction {
+    return action.type === ActionType.FETCH_STARTED;
+  }
   
   /** A type predicate to tell if `action` is a `FetchCompletedAction` */
   function isFetchCompletedAction(
     action: Action
   ): action is FetchCompletedAction {
     return action.type === ActionType.FETCH_COMPLETED;
+  }
+
+  
+  /** A type predicate to tell if `action` is a `FetchErrorAction` */
+  function isFetchErrorAction(
+    action: Action
+  ): action is FetchCompletedAction {
+    return action.type === ActionType.FETCH_ERROR;
   }
   
    /** A type predicate to tell if `action` is a `ChangeOrderAction` */
@@ -79,6 +104,10 @@ interface BaseAction<T> {
     offset: number;
     /** Order by Market cap (asc, desc) */
     orderBy: 'asc' | 'desc';
+    /** Stock fetching is in progress */
+    loading: boolean;
+    /** The current fetch error */
+    fetchError: Error | null
   }
 
   /** The initial state of the application */
@@ -87,6 +116,8 @@ interface BaseAction<T> {
     country: 'au',
     offset: 0,
     orderBy: 'desc',
+    loading: false,
+    fetchError: null
   };
 
   /** A reducer to use with useReducer hook.
@@ -114,10 +145,19 @@ interface BaseAction<T> {
         offset: 0,
         orderBy: action.payload,
       };
+      /** Handle FETCH_STARTED action to set loading flag to true */
+    } else if (isFetchStartedAction(action)) {
+      return {
+        ...state,
+        fetchError: null,
+        loading: true,
+      };
     /** Handle FETCH_COMPLETED action to update the list of displayed stocks */
     } else if (isFetchCompletedAction(action)) {
       return {
         ...state,
+        loading: false,
+        fetchError: null,
         stocks:
           /* If offset is 0, that means we are doing an initial load,
            * or changing a country or an ordering.
@@ -127,6 +167,14 @@ interface BaseAction<T> {
           state.offset === 0
             ? action.payload
             : [...state.stocks, ...action.payload],
+      };
+      /** Handle FETCH_ERROR action to reset "loading" flag and show the error message */
+    } else if (isFetchErrorAction(action)) {
+      return {
+        ...state,
+        loading: false,
+        fetchError: action.payload,
+        stocks:[]
       };
     } else {
       // We should use some kind of structured server logging here instead of console logging.
