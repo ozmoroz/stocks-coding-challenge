@@ -1,87 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Card, Container } from 'react-bootstrap';
+import React, { useEffect, useReducer } from 'react';
+import {
+  Button,
+  Card,
+  Container,
+  ToggleButtonGroup,
+  ToggleButton,
+} from 'react-bootstrap';
 import Link from 'next/link';
-
-interface Props {
-  name?: string;
-}
-
-/** Info returned from Stocks API for a single stock. */
-interface StockData {
-  // Comments are sample data for Royal Bank of Canada
-  canonical_url: string; // "/stocks/ca/banks/tsx-ry/royal-bank-of-canada-shares"
-  company_id: string; // "1592FD9F-BF5B-469D-B8F3-D33379E0C0DE"
-  exchange_symbol: string; // "TSX"
-  id: number; // 109809;
-  info: {
-    data: {
-      description: string; // "Royal Bank of Canada operates as a diversified financial service company worldwide"
-      logo_url: string; // "/api/company/image/NYSE:RY/logo"
-    };
-  };
-  name: string; // "Royal Bank of Canada"
-  score: {
-    data: {
-      future: number; // 1
-      health: number; // 6
-      income: number; // 5
-      management: number; // 0
-      misc: number; // 0
-      past: number; // 4
-      sentence: string; // "Flawless balance sheet established dividend payer."
-      total: number; // 18
-      value: number; // 2
-    };
-  };
-  slug: string; // "royal-bank-of-canada"
-  ticker_symbol: string; // "RY"
-  unique_symbol: string; // "TSX:RY"
-}
+import { StockData } from 'interfaces/StockData';
+import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'reducer';
+import { MarketsDropdown } from 'components/MarketsDropdown';
+import { StateChangeFunction } from 'downshift';
 
 /** Base URL of the site. We need this to suppolement relative URLs
 because we are serving this page from a different domain. */
 const BASE_URL = 'https://simplywall.st';
 
-const App: React.FunctionComponent<Props> = ({ name }) => {
-  /**  Stocks data */
-  const [stocks, setStocks] = useState<StockData[]>([]);
+const App: React.FunctionComponent = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    fetch('https://api.simplywall.st/api/grid/filter?include=info,score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: 1,
-        no_result_if_limit: false,
-        offset: 0,
-        size: 12,
-        state: 'read',
-        rules: JSON.stringify([
-          ['order_by', 'market_cap', 'desc'],
-          ['grid_visible_flag', '=', true],
-          ['market_cap', 'is_not_null'],
-          ['primary_flag', '=', true],
-          ['is_fund', '=', false],
-          ['aor', [['country_name', 'in', ['ca']]]],
-        ]),
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => setStocks(data.data as StockData[]))
-      .catch((err) => console.log(err));
-  });
+  /** Fetch the list of stocks from the API.
+   * Re-runs when either a stock offset, selected country or stock ordering change.
+   */
+  useEffect(
+    () => {
+      fetch('https://api.simplywall.st/api/grid/filter?include=info,score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: 1,
+          no_result_if_limit: false,
+          offset: state.offset,
+          size: STOCKS_PER_PAGE,
+          state: 'read',
+          rules: JSON.stringify([
+            ['order_by', 'market_cap', state.orderBy],
+            ['grid_visible_flag', '=', true],
+            ['market_cap', 'is_not_null'],
+            ['primary_flag', '=', true],
+            ['is_fund', '=', false],
+            ['aor', [['country_name', 'in', [state.country]]]],
+          ]),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          dispatch({
+            type: ActionType.FETCH_COMPLETED,
+            payload: data.data as StockData[],
+          });
+        })
+        // TODO: Show error message
+        .catch((err) => console.log(err));
+    },
+    /** Re-load the data if the current country or stock ordering changed.
+     * Load more stocks if the offset changed
+     */
+    [state.offset, state.country, state.orderBy]
+  );
 
-  //   if (error) return <div>An error has occurred: ${error.message};</div>;
+  /** Hanle "Load More" button click */
+  const handleLoadMore = () => {
+    dispatch({ type: ActionType.LOAD_MORE });
+  };
+
+  /** Hanlde selecting the market cap stock sort order */
+  const handleOrderChanged = (order: typeof state.orderBy) => {
+    dispatch({
+      type: ActionType.CHANGE_ORDER,
+      payload: order,
+    });
+  };
+
+  //   TODO: if (error) return <div>An error has occurred: ${error.message};</div>;
   return (
     <Container>
-      <h1>The {name}</h1>
-      {stocks.map((stock) => (
+      <MarketsDropdown
+        selectedCountry={state.country}
+        onChange={(country) =>
+          dispatch({ type: ActionType.CHANGE_COUNTRY, payload: country })
+        }
+      />
+      <ToggleButtonGroup
+        type="checkbox"
+        value={[state.orderBy]}
+        onChange={(ev) => {
+          handleOrderChanged(ev[1] as 'asc' | 'desc');
+        }}>
+        <ToggleButton id="tbg-btn-1" value="asc">
+          Ascending
+        </ToggleButton>
+        <ToggleButton id="tbg-btn-2" value="desc">
+          Descending
+        </ToggleButton>
+      </ToggleButtonGroup>
+      {state.stocks.map((stock) => (
         <Card key={stock.id}>
           <Card.Body>
             <Card.Title>
-              <Link href={`${BASE_URL}/${stock.canonical_url}`}>
+              <Link href={`${BASE_URL}${stock.canonical_url}`}>
                 {stock.unique_symbol}
               </Link>
             </Card.Title>
@@ -99,20 +118,14 @@ const App: React.FunctionComponent<Props> = ({ name }) => {
               </ul>
               <p>{stock.score.data.sentence}</p>
             </Card.Text>
-            {/* <Button variant="primary">Go somewhere</Button> */}
           </Card.Body>
         </Card>
       ))}
+      <Button variant="primary" onClick={handleLoadMore}>
+        Load more...
+      </Button>
     </Container>
   );
-  //   <div>
-  //   <strong>👀 {data.subscribers_count}</strong>{' '}
-  //        <strong>✨ {data.stargazers_count}</strong>{' '}
-  //        <strong>🍴 {data.forks_count}</strong>);
-  //        </div>
 };
 
-App.defaultProps = {
-  name: 'Grid',
-};
 export default App;
