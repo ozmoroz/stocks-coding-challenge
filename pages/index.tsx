@@ -6,6 +6,7 @@ import {
   Container,
   Form,
   Row,
+  Stack,
   ToggleButtonGroup,
   ToggleButton,
 } from 'react-bootstrap';
@@ -14,8 +15,9 @@ import { StockData } from 'interfaces/StockData';
 import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'state';
 import { MarketsDropdown } from 'components/MarketsDropdown';
 import { StockTile } from 'components/StockTile';
+import { SkeletonTile } from 'components/SkeletonTile';
 
-const App: React.FunctionComponent = () => {
+const IndexPage: React.FunctionComponent = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   /** Fetch the list of stocks from the API.
@@ -99,16 +101,14 @@ const App: React.FunctionComponent = () => {
       // Show the list of stocks
     } else if (state.stocks.length > 0) {
       return (
-        <React.Fragment>
+        <Stack gap={3}>
           {state.stocks.map((stock) => (
             <StockTile data={stock} />
           ))}
           {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
           {state.isFetching &&
-            new Array(STOCKS_PER_PAGE)
-              .fill(0)
-              .map((_, i) => <div>Loading...</div>)}
-        </React.Fragment>
+            new Array(STOCKS_PER_PAGE).fill(0).map((_, i) => <SkeletonTile />)}
+        </Stack>
       );
     }
   };
@@ -167,4 +167,4 @@ const App: React.FunctionComponent = () => {
   );
 };
 
-export default App;
+export default IndexPage;

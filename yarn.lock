@@ -2319,6 +2319,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-content-loader@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "react-content-loader@npm:6.1.0"
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: d466d59bf8079fe97bf12b1cd5c84c374d57eae7b22227a6756ff955e65a58f723f50555b237f216a70a5f94107dff10663b6de1be131669be6b1facfa546869
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:17.0.2":
   version: 17.0.2
   resolution: "react-dom@npm:17.0.2"
@@ -2567,6 +2576,7 @@ __metadata:
     next: 12.0.10
     react: 17.0.2
     react-bootstrap: 2.1.2
+    react-content-loader: ^6.1.0
     react-dom: 17.0.2
     styled-components: ^5.3.3
     typescript: 4.5.5
