@@ -54,7 +54,7 @@ export const MarketsDropdown: React.FunctionComponent<Props> = ({
         );
       },
       onSelectedItemChange: ({ selectedItem }) => {
-        if (onChange) onChange(selectedItem.option);
+        if (onChange && selectedItem) onChange(selectedItem.option);
       },
     });
     return (

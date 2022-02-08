@@ -9,6 +9,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from 'react-bootstrap';
+import { ApiResponse } from 'interfaces/ApiResponse';
 import { StockData } from 'interfaces/StockData';
 import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'state';
 import { MarketsDropdown } from 'components/MarketsDropdown';
@@ -48,7 +49,10 @@ const App: React.FunctionComponent = () => {
         .then((data) => {
           dispatch({
             type: ActionType.FETCH_COMPLETED,
-            payload: data.data as StockData[],
+            payload: {
+              stocks: (data as ApiResponse).data as StockData[],
+              totalRecords: (data as ApiResponse).meta.total_records,
+            },
           });
         })
         .catch((err) => {
@@ -77,7 +81,38 @@ const App: React.FunctionComponent = () => {
     });
   };
 
-  //   TODO: if (error) return <div>An error has occurred: ${error.message};</div>;
+  /** Render an error message, stock tiles, loading skeleton tiles, or no stocks found messge. */
+  const renderStockList = () => {
+    if (state.error) {
+      /* Fetch error happened - show error message.
+        We show a generic error message to the user rather than the actual error message
+        we received from the API. That is because the actual error may contain sensitive information.
+        Besides, most likely it has no value to the user.
+        We show a generic error message but log the real one.
+      */
+      return <Alert variant="danger">An error has occurred.</Alert>;
+      // No stocks were found for this country - show an info message
+    } else if (!state.isFetching && state.stocks.length === 0) {
+      return (
+        <Alert variant="info">No stocks found for the selected market.</Alert>
+      );
+      // Show the list of stocks
+    } else if (state.stocks.length > 0) {
+      return (
+        <React.Fragment>
+          {state.stocks.map((stock) => (
+            <StockTile data={stock} />
+          ))}
+          {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
+          {state.isFetching &&
+            new Array(STOCKS_PER_PAGE)
+              .fill(0)
+              .map((_, i) => <div>Loading...</div>)}
+        </React.Fragment>
+      );
+    }
+  };
+
   return (
     <Container>
       <Form>
@@ -85,9 +120,13 @@ const App: React.FunctionComponent = () => {
           <Col>
             <MarketsDropdown
               selectedCountry={state.country}
-              onChange={(country) =>
-                dispatch({ type: ActionType.CHANGE_COUNTRY, payload: country })
-              }
+              onChange={(country) => {
+                if (country)
+                  dispatch({
+                    type: ActionType.CHANGE_COUNTRY,
+                    payload: country,
+                  });
+              }}
             />
           </Col>
           <Col>
@@ -113,32 +152,17 @@ const App: React.FunctionComponent = () => {
           </Col>
         </Row>
       </Form>
-      {/* Fetch error happened - show error message.
-          We show a generic error message to the user rather than the actual error message
-          we received from the API. That is because the actual error may contain sensitive information.
-          Besides, most likely it has no value to the user.
-          We show a generic error message but log the real one.
-          */}
-      {state.error && (
+      {renderStockList()}
+      {/* Show Load more button if there are more stocks to load */}
+      {state.stocks.length < state.totalRecords && (
         <Row>
           <Col>
-            <Alert variant="danger">An error has occurred.</Alert>
+            <Button variant="primary" onClick={handleLoadMore}>
+              Load more...
+            </Button>
           </Col>
         </Row>
       )}
-      {state.stocks.map((stock) => (
-        <StockTile data={stock} />
-      ))}
-      {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
-      {state.isFetching &&
-        new Array(STOCKS_PER_PAGE).fill(0).map((_, i) => <div>Loading...</div>)}
-      <Row>
-        <Col>
-          <Button variant="primary" onClick={handleLoadMore}>
-            Load more...
-          </Button>
-        </Col>
-      </Row>
     </Container>
   );
 };

@@ -29,6 +29,14 @@ interface BaseAction<T> {
     type: ActionType;
     payload?: T;
   }
+
+  /** Payload type of FETCH_COMPLETED action */
+  interface FetchCompletedPayload {
+    /** Loaded stocks */
+    stocks: StockData[];
+    /** Total number of stocks */
+    totalRecords: number;
+  }
   
   /** An action type to load more stocks. Does not contain a payload */
   type LoadMoreAction = BaseAction<void>;
@@ -41,7 +49,7 @@ interface BaseAction<T> {
     /** An action to that fires when stock fetching from the API resulted in an error */
   type FetchFailedAction = BaseAction<Error>;
   /** An action to that fires when stock fetching from the API is completed */
-  type FetchCompletedAction = BaseAction<StockData[]>;
+  type FetchCompletedAction = BaseAction<FetchCompletedPayload>;
   
   /** Common type for all of our actions */
   type Action =
@@ -102,6 +110,8 @@ interface BaseAction<T> {
   interface State {
     /** Currently shown stocks */
     stocks: StockData[];
+    /** Total number of stocks returned by the API*/
+    totalRecords: number;
     /** Currently selected market. Defaults to Australia */
     country: string;
     /** The current offset of the stocks to load */
@@ -117,10 +127,11 @@ interface BaseAction<T> {
   /** The initial state of the application */
   export const initialState: State = {
     stocks: [],
+    totalRecords: 0,
     country: 'au',
     offset: 0,
     orderBy: 'desc',
-    isFetching: false,
+    isFetching: true,
     error: null
   };
 
@@ -147,12 +158,14 @@ interface BaseAction<T> {
       return {
         ...state,
         offset: 0,
+        totalRecords: 0,
         orderBy: action.payload,
       };
       /** Handle FETCH_STARTED action to set loading flag to true */
     } else if (isFetchStartedAction(action)) {
       return {
         ...state,
+        totalRecords: 0,
         error: null,
         isFetching: true,
       };
@@ -169,8 +182,9 @@ interface BaseAction<T> {
            * Otherwise, append the loaded stocks to the existing ones
            */
           state.offset === 0
-            ? action.payload
-            : [...state.stocks, ...action.payload],
+            ? action.payload.stocks
+            : [...state.stocks, ...action.payload.stocks],
+        totalRecords: action.payload.totalRecords
       };
       /** Handle FETCH_FAILED action to reset "loading" flag and show the error message */
     } else if (isFetchFailedAction(action)) {
@@ -178,7 +192,8 @@ interface BaseAction<T> {
         ...state,
         isFetching: false,
         error: action.payload,
-        stocks:[]
+        stocks:[],
+        totalRecords: 0
       };
     } else {
       // We should use some kind of structured server logging here instead of console logging.
