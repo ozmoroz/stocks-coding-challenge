@@ -1,0 +1,13 @@
+/* Jest setup file for Next.js
+ * ref: https://github.com/vercel/next.js/blob/canary/examples/with-jest/jest.setup.js
+ */
+
+// Optional: configure or set up a testing framework before each test.
+// If you delete this file, remove `setupFilesAfterEnv` from `jest.config.js`
+
+// Used for __tests__/testing-library.js
+// Learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom/extend-expect';
+import 'jest-styled-components';
+const { toHaveNoViolations } = require('jest-axe')
+expect.extend(toHaveNoViolations)
