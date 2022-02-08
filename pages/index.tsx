@@ -1,20 +1,14 @@
 import React, { useEffect, useReducer } from 'react';
 import {
   Button,
-  Card,
   Container,
   ToggleButtonGroup,
   ToggleButton,
 } from 'react-bootstrap';
-import Link from 'next/link';
 import { StockData } from 'interfaces/StockData';
 import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'state';
 import { MarketsDropdown } from 'components/MarketsDropdown';
-import { StateChangeFunction } from 'downshift';
-
-/** Base URL of the site. We need this to suppolement relative URLs
-because we are serving this page from a different domain. */
-const BASE_URL = 'https://simplywall.st';
+import { StockTile } from 'components/StockTile';
 
 const App: React.FunctionComponent = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -109,29 +103,7 @@ const App: React.FunctionComponent = () => {
           */}
       {state.error && <div>An error has occurred: </div>}
       {state.stocks.map((stock) => (
-        <Card key={stock.id}>
-          <Card.Body>
-            <Card.Title>
-              <Link href={`${BASE_URL}${stock.canonical_url}`}>
-                {stock.unique_symbol}
-              </Link>
-            </Card.Title>
-            <Card.Subtitle>{stock.name}</Card.Subtitle>
-            <Card.Text>{stock.info.data.description}</Card.Text>
-            <Card.Text>
-              Score:
-              <ul>
-                <li>value: {stock.score.data.value} </li>
-                <li>future: {stock.score.data.future}</li>
-                <li>past: {stock.score.data.past}</li>
-                <li>health: {stock.score.data.health}</li>
-                <li>income: {stock.score.data.income}</li>
-                <li>total: {stock.score.data.total}</li>
-              </ul>
-              <p>{stock.score.data.sentence}</p>
-            </Card.Text>
-          </Card.Body>
-        </Card>
+        <StockTile data={stock} />
       ))}
       {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
       {state.isFetching &&
