@@ -1,6 +1,6 @@
-import { Card, Stack } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { StockData } from 'interfaces/StockData';
-import { BASE_URL } from 'state';
+import { BASE_URL } from 'interfaces/constants';
 
 export interface Props {
   /** Stock information to show in a tile */
@@ -45,5 +45,3 @@ export const StockTile: React.FunctionComponent<Props> = ({
     </Card>
   );
 };
-
-// export const StockTile: React.FunctionComponent<Props> = ({id, canonical_url,unique_symbol name, info: {data: {description}} }) => {

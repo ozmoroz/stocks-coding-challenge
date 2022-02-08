@@ -1,12 +1,5 @@
-
 import { StockData } from "interfaces/StockData";
-
-/** Base URL of the site. We need this to suppolement relative URLs
-because we are serving this page from a different domain. */
-export const BASE_URL = 'https://simplywall.st';
-
-/// Number to stocks show per page
-export const STOCKS_PER_PAGE = 12;
+import { STOCKS_PER_PAGE, State } from "./state";
 
 /** All possible action types */
 export enum ActionType {
@@ -106,39 +99,10 @@ interface BaseAction<T> {
     return action.type === ActionType.CHANGE_ORDER;
   }
 
-  /** The application state type */
-  interface State {
-    /** Currently shown stocks */
-    stocks: StockData[];
-    /** Total number of stocks returned by the API*/
-    totalRecords: number;
-    /** Currently selected market. Defaults to Australia */
-    country: string;
-    /** The current offset of the stocks to load */
-    offset: number;
-    /** Order by Market cap (asc, desc) */
-    orderBy: 'asc' | 'desc';
-    /** Stock fetching is in progress */
-    isFetching: boolean;
-    /** The current fetch error */
-    error: Error | null
-  }
-
-  /** The initial state of the application */
-  export const initialState: State = {
-    stocks: [],
-    totalRecords: 0,
-    country: 'au',
-    offset: 0,
-    orderBy: 'desc',
-    isFetching: true,
-    error: null
-  };
-
   /** A reducer to use with useReducer hook.
    * Ref: https://reactjs.org/docs/hooks-reference.html#usereducer
    */
-  export function reducer(
+   export function reducer(
     state: State,
     action: Action
   ): State {

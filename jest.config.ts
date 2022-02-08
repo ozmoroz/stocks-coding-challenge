@@ -19,7 +19,8 @@ const customJestConfig = {
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
     '^@/state/(.*)$': '<rootDir>/state/$1',
     '^@/styles/(.*)$': '<rootDir>/styles/$1',
-    "^state$": "<rootDir>/state.ts",
+    // TODO: There must be better way to do this, but I couldn't find it :-()
+    "^interfaces/constants$": "<rootDir>/interfaces/constants.ts",
   },
   testEnvironment: 'jest-environment-jsdom',
 };
