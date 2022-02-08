@@ -1,9 +1,8 @@
 import { Card, Stack } from 'react-bootstrap';
-import Link from 'next/link';
 import { StockData } from 'interfaces/StockData';
 import { BASE_URL } from 'state';
 
-interface Props {
+export interface Props {
   /** Stock information to show in a tile */
   data: StockData;
 }
@@ -26,11 +25,11 @@ export const StockTile: React.FunctionComponent<Props> = ({
     <Card key={id}>
       <Card.Body>
         <Card.Title>
-          <Link href={`${BASE_URL}${canonical_url}`}>{unique_symbol}</Link>
+          <a href={`${BASE_URL}${canonical_url}`}>{unique_symbol}</a>
         </Card.Title>
         <Card.Subtitle>{name}</Card.Subtitle>
         <Card.Text>{description}</Card.Text>
-        <Card.Text>
+        <div>
           Score:
           <ul>
             <li>value: {value} </li>
@@ -41,7 +40,7 @@ export const StockTile: React.FunctionComponent<Props> = ({
           </ul>
           <Card.Text>Total: {total}</Card.Text>
           <Card.Text>{sentence}</Card.Text>
-        </Card.Text>
+        </div>
       </Card.Body>
     </Card>
   );
