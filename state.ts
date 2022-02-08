@@ -151,6 +151,7 @@ interface BaseAction<T> {
         ...state,
         country: action.payload,
         offset: 0,
+        totalRecords: 0,
         stocks: [],
       };
     /** Handle CHANGE_ORDER action to change the stocks ordering by market cap (Ascending/Descending) */
@@ -158,6 +159,7 @@ interface BaseAction<T> {
       return {
         ...state,
         offset: 0,
+        stocks: [],
         totalRecords: 0,
         orderBy: action.payload,
       };

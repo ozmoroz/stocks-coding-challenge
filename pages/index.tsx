@@ -99,7 +99,7 @@ const IndexPage: React.FunctionComponent = () => {
         <Alert variant="info">No stocks found for the selected market.</Alert>
       );
       // Show the list of stocks
-    } else if (state.stocks.length > 0) {
+    } else {
       return (
         <Stack gap={3}>
           {state.stocks.map((stock) => (
@@ -107,7 +107,9 @@ const IndexPage: React.FunctionComponent = () => {
           ))}
           {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
           {state.isFetching &&
-            new Array(STOCKS_PER_PAGE).fill(0).map((_, i) => <SkeletonTile />)}
+            new Array(STOCKS_PER_PAGE)
+              .fill(0)
+              .map((_, i) => <SkeletonTile key={`skeleton-${i}`} />)}
         </Stack>
       );
     }
@@ -136,16 +138,17 @@ const IndexPage: React.FunctionComponent = () => {
               </Form.Label>
               <ToggleButtonGroup
                 id="sort-by-toggle"
-                type="checkbox"
+                type="radio"
+                name="sort-order"
                 value={[state.orderBy]}
-                onChange={(ev) => {
-                  handleOrderChanged(ev[1] as 'asc' | 'desc');
+                onChange={(order) => {
+                  handleOrderChanged(order as 'asc' | 'desc');
                 }}>
-                <ToggleButton id="tbg-btn-1" value="asc">
-                  Ascending
-                </ToggleButton>
-                <ToggleButton id="tbg-btn-2" value="desc">
+                <ToggleButton id="order-desc" value="desc">
                   Descending
+                </ToggleButton>
+                <ToggleButton id="order-asc" value="asc">
+                  Ascending
                 </ToggleButton>
               </ToggleButtonGroup>
             </Form.Group>
