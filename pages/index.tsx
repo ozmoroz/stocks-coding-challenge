@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import Link from 'next/link';
 import { StockData } from 'interfaces/StockData';
-import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'reducer';
+import { ActionType, reducer, initialState, STOCKS_PER_PAGE } from 'state';
 import { MarketsDropdown } from 'components/MarketsDropdown';
 import { StateChangeFunction } from 'downshift';
 
@@ -24,6 +24,7 @@ const App: React.FunctionComponent = () => {
    */
   useEffect(
     () => {
+      dispatch({ type: ActionType.FETCH_STARTED });
       fetch('https://api.simplywall.st/api/grid/filter?include=info,score', {
         method: 'POST',
         headers: {
@@ -52,8 +53,12 @@ const App: React.FunctionComponent = () => {
             payload: data.data as StockData[],
           });
         })
-        // TODO: Show error message
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          dispatch({ type: ActionType.FETCH_FAILED, payload: err });
+          // Ideally we should log the error to some kind of structured server-side logging engine
+          // rather than logging the error to the console
+          console.log(err);
+        });
     },
     /** Re-load the data if the current country or stock ordering changed.
      * Load more stocks if the offset changed
@@ -96,6 +101,13 @@ const App: React.FunctionComponent = () => {
           Descending
         </ToggleButton>
       </ToggleButtonGroup>
+      {/* Fetch error happened - show error message.
+          We show a generic error message to the user rather than the actual error message
+          we received from the API. That is because the actual error may contain sensitive information.
+          Besides, most likely it has no value to the user.
+          We show a generic error message but log the real one.
+          */}
+      {state.error && <div>An error has occurred: </div>}
       {state.stocks.map((stock) => (
         <Card key={stock.id}>
           <Card.Body>
@@ -121,6 +133,9 @@ const App: React.FunctionComponent = () => {
           </Card.Body>
         </Card>
       ))}
+      {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
+      {state.isFetching &&
+        new Array(STOCKS_PER_PAGE).fill(0).map((_, i) => <div>Loading...</div>)}
       <Button variant="primary" onClick={handleLoadMore}>
         Load more...
       </Button>
