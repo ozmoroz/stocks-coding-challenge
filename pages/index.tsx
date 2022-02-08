@@ -156,7 +156,7 @@ const IndexPage: React.FunctionComponent = () => {
       {/* Show Load more button if there are more stocks to load */}
       {state.stocks.length < state.totalRecords && (
         <Row>
-          <Col>
+          <Col className="d-flex justify-content-center my-2">
             <Button variant="primary" onClick={handleLoadMore}>
               Load more...
             </Button>
