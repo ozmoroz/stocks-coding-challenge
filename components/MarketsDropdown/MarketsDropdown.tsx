@@ -1,7 +1,5 @@
-// import { Dropdown } from 'react-bootstrap';
 import { useState } from 'react';
 import { useCombobox } from 'downshift';
-import styled from 'styled-components';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import MARKETS from '../../markets.json';
 import { Dropdown, DropdownContent, DropdownItem } from './styles';
@@ -79,15 +77,11 @@ export const MarketsDropdown: React.FunctionComponent<Props> = ({
               </Button>
             </InputGroup>
 
-            <DropdownContent {...getMenuProps()} /*style={menuStyles}*/>
+            <DropdownContent {...getMenuProps()}>
               {isOpen &&
                 inputItems.map((item, index) => (
                   <DropdownItem
-                    style={
-                      highlightedIndex === index
-                        ? { backgroundColor: '#bde4ff' }
-                        : {}
-                    }
+                    isHighlighted={highlightedIndex === index}
                     key={item.option}
                     {...getItemProps({ item, index })}>
                     {item.label}
