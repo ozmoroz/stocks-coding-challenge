@@ -1,7 +1,11 @@
 import React, { useEffect, useReducer } from 'react';
 import {
+  Alert,
   Button,
+  Col,
   Container,
+  Form,
+  Row,
   ToggleButtonGroup,
   ToggleButton,
 } from 'react-bootstrap';
@@ -76,41 +80,65 @@ const App: React.FunctionComponent = () => {
   //   TODO: if (error) return <div>An error has occurred: ${error.message};</div>;
   return (
     <Container>
-      <MarketsDropdown
-        selectedCountry={state.country}
-        onChange={(country) =>
-          dispatch({ type: ActionType.CHANGE_COUNTRY, payload: country })
-        }
-      />
-      <ToggleButtonGroup
-        type="checkbox"
-        value={[state.orderBy]}
-        onChange={(ev) => {
-          handleOrderChanged(ev[1] as 'asc' | 'desc');
-        }}>
-        <ToggleButton id="tbg-btn-1" value="asc">
-          Ascending
-        </ToggleButton>
-        <ToggleButton id="tbg-btn-2" value="desc">
-          Descending
-        </ToggleButton>
-      </ToggleButtonGroup>
+      <Form>
+        <Row>
+          <Col>
+            <MarketsDropdown
+              selectedCountry={state.country}
+              onChange={(country) =>
+                dispatch({ type: ActionType.CHANGE_COUNTRY, payload: country })
+              }
+            />
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="sort-by-toggle">
+                Sort by market cap:
+              </Form.Label>
+              <ToggleButtonGroup
+                id="sort-by-toggle"
+                type="checkbox"
+                value={[state.orderBy]}
+                onChange={(ev) => {
+                  handleOrderChanged(ev[1] as 'asc' | 'desc');
+                }}>
+                <ToggleButton id="tbg-btn-1" value="asc">
+                  Ascending
+                </ToggleButton>
+                <ToggleButton id="tbg-btn-2" value="desc">
+                  Descending
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Form.Group>
+          </Col>
+        </Row>
+      </Form>
       {/* Fetch error happened - show error message.
           We show a generic error message to the user rather than the actual error message
           we received from the API. That is because the actual error may contain sensitive information.
           Besides, most likely it has no value to the user.
           We show a generic error message but log the real one.
           */}
-      {state.error && <div>An error has occurred: </div>}
+      {state.error && (
+        <Row>
+          <Col>
+            <Alert variant="danger">An error has occurred.</Alert>
+          </Col>
+        </Row>
+      )}
       {state.stocks.map((stock) => (
         <StockTile data={stock} />
       ))}
       {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
       {state.isFetching &&
         new Array(STOCKS_PER_PAGE).fill(0).map((_, i) => <div>Loading...</div>)}
-      <Button variant="primary" onClick={handleLoadMore}>
-        Load more...
-      </Button>
+      <Row>
+        <Col>
+          <Button variant="primary" onClick={handleLoadMore}>
+            Load more...
+          </Button>
+        </Col>
+      </Row>
     </Container>
   );
 };

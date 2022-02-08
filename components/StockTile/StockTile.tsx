@@ -1,6 +1,7 @@
-import { Card } from 'react-bootstrap';
+import { Card, Stack } from 'react-bootstrap';
 import Link from 'next/link';
 import { StockData } from 'interfaces/StockData';
+import { StockCard } from './style';
 import { BASE_URL } from 'state';
 
 interface Props {
@@ -23,27 +24,29 @@ export const StockTile: React.FunctionComponent<Props> = ({
   },
 }) => {
   return (
-    <Card key={id}>
-      <Card.Body>
-        <Card.Title>
-          <Link href={`${BASE_URL}${canonical_url}`}>{unique_symbol}</Link>
-        </Card.Title>
-        <Card.Subtitle>{name}</Card.Subtitle>
-        <Card.Text>{description}</Card.Text>
-        <Card.Text>
-          Score:
-          <ul>
-            <li>value: {value} </li>
-            <li>future: {future}</li>
-            <li>past: {past}</li>
-            <li>health: {health}</li>
-            <li>income: {income}</li>
-            <li>total: {total}</li>
-          </ul>
-          <p>{sentence}</p>
-        </Card.Text>
-      </Card.Body>
-    </Card>
+    <Stack gap={8}>
+      <StockCard key={id}>
+        <Card.Body>
+          <Card.Title>
+            <Link href={`${BASE_URL}${canonical_url}`}>{unique_symbol}</Link>
+          </Card.Title>
+          <Card.Subtitle>{name}</Card.Subtitle>
+          <Card.Text>{description}</Card.Text>
+          <Card.Text>
+            Score:
+            <ul>
+              <li>value: {value} </li>
+              <li>future: {future}</li>
+              <li>past: {past}</li>
+              <li>health: {health}</li>
+              <li>income: {income}</li>
+              <li>total: {total}</li>
+            </ul>
+            <p>{sentence}</p>
+          </Card.Text>
+        </Card.Body>
+      </StockCard>
+    </Stack>
   );
 };
 

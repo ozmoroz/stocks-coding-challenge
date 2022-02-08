@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useCombobox } from 'downshift';
 import styled from 'styled-components';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 import MARKETS from '../../markets.json';
 import { Dropdown, DropdownContent, DropdownItem } from './styles';
 
@@ -58,36 +59,43 @@ export const MarketsDropdown: React.FunctionComponent<Props> = ({
     });
     return (
       <Dropdown>
-        <label {...getLabelProps()}>Choose a market:</label>
-        <div
-          //   className=".downshift-dropdown"
-          // style={comboboxStyles}
-          {...getComboboxProps()}>
-          <input {...getInputProps()} />
-          <button
-            className="dropdown-button"
-            type="button"
-            {...getToggleButtonProps()}
-            aria-label="toggle menu">
-            &#8595;
-          </button>
+        <Form.Group className="mb-3">
+          <div {...getComboboxProps()}>
+            <Form.Label htmlFor="country-dropdown" {...getLabelProps()}>
+              Choose a market:
+            </Form.Label>
+            <InputGroup>
+              <Form.Control
+                id="country-dropdown"
+                type="text"
+                {...getInputProps()}
+              />
+              <Button
+                variant="outline-secondary"
+                id="button-addon2"
+                {...getToggleButtonProps()}
+                aria-label="toggle menu">
+                &#8595;
+              </Button>
+            </InputGroup>
 
-          <DropdownContent {...getMenuProps()} /*style={menuStyles}*/>
-            {isOpen &&
-              inputItems.map((item, index) => (
-                <DropdownItem
-                  style={
-                    highlightedIndex === index
-                      ? { backgroundColor: '#bde4ff' }
-                      : {}
-                  }
-                  key={item.option}
-                  {...getItemProps({ item, index })}>
-                  {item.label}
-                </DropdownItem>
-              ))}
-          </DropdownContent>
-        </div>
+            <DropdownContent {...getMenuProps()} /*style={menuStyles}*/>
+              {isOpen &&
+                inputItems.map((item, index) => (
+                  <DropdownItem
+                    style={
+                      highlightedIndex === index
+                        ? { backgroundColor: '#bde4ff' }
+                        : {}
+                    }
+                    key={item.option}
+                    {...getItemProps({ item, index })}>
+                    {item.label}
+                  </DropdownItem>
+                ))}
+            </DropdownContent>
+          </div>
+        </Form.Group>
       </Dropdown>
     );
   }
