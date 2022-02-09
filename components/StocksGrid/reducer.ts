@@ -131,7 +131,6 @@ interface BaseAction<T> {
     } else if (isFetchStartedAction(action)) {
       return {
         ...state,
-        totalRecords: 0,
         error: null,
         isFetching: true,
       };
