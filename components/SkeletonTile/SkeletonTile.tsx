@@ -10,6 +10,7 @@ import { StyledContentLoader } from './styles';
 
 export const SkeletonTile: React.FunctionComponent = () => (
   <StyledContentLoader
+    aria-hidden="true"
     speed={2}
     viewBox="0 0 400 160"
     backgroundColor="#f3f3f3"

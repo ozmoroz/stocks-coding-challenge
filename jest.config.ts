@@ -23,6 +23,11 @@ const customJestConfig = {
     // TODO: There must be better way to do this, but I couldn't find it :-()
     '^interfaces/constants$': '<rootDir>/interfaces/constants.ts',
     '^mocks/stocks.mock$': '<rootDir>/mocks/stocks.mock.ts',
+    '^components/MarketsDropdown$':
+      '<rootDir>/components/MarketsDropdown/MarketsDropdown.tsx',
+    '^components/StockTile$': '<rootDir>/components/StockTile/StockTile.tsx',
+    '^components/SkeletonTile$':
+      '<rootDir>/components/SkeletonTile/SkeletonTile.tsx',
   },
   testEnvironment: 'jest-environment-jsdom',
 };
