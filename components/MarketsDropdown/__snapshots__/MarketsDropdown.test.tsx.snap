@@ -4,15 +4,20 @@ exports[`MarketsDropdown matches the snapshot 1`] = `
 .c0 {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 .c1 {
+  border-color: rgb(206,212,218);
+}
+
+.c2 {
   list-style: none;
   position: absolute;
   background-color: #fff;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  z-index: 100;
   padding: 0;
 }
 
@@ -51,7 +56,7 @@ exports[`MarketsDropdown matches the snapshot 1`] = `
           />
           <button
             aria-label="toggle menu"
-            class="btn btn-outline-secondary"
+            class="c1 btn btn-outline-secondary"
             id="downshift-19-toggle-button"
             tabindex="-1"
             type="button"
@@ -61,7 +66,7 @@ exports[`MarketsDropdown matches the snapshot 1`] = `
         </div>
         <ul
           aria-labelledby="downshift-19-label"
-          class="c1"
+          class="c2"
           id="downshift-19-menu"
           role="listbox"
         />

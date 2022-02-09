@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { useCombobox } from 'downshift';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import MARKETS from '../../markets.json';
-import { Dropdown, DropdownContent, DropdownItem } from './styles';
+import {
+  Dropdown,
+  DropdownButton,
+  DropdownContent,
+  DropdownItem,
+} from './styles';
 
 export interface Props {
   selectedCountry?: string;
@@ -68,13 +73,13 @@ export const MarketsDropdown: React.FunctionComponent<Props> = ({
                 type="text"
                 {...getInputProps()}
               />
-              <Button
+              <DropdownButton
                 variant="outline-secondary"
                 id="button-addon2"
                 {...getToggleButtonProps()}
                 aria-label="toggle menu">
                 &#8595;
-              </Button>
+              </DropdownButton>
             </InputGroup>
 
             <DropdownContent {...getMenuProps()}>

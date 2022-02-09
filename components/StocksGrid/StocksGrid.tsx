@@ -120,7 +120,7 @@ export const StocksGrid: React.FunctionComponent = () => {
     <Container>
       <Form>
         <Row>
-          <Col>
+          <Col sm={5} md={4} lg={3}>
             <MarketsDropdown
               selectedCountry={state.country}
               onChange={(country) => {
