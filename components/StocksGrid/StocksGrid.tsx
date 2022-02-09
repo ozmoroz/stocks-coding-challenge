@@ -50,6 +50,7 @@ export const StocksGrid: React.FunctionComponent = () => {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log(data);
           dispatch({
             type: ActionType.FETCH_COMPLETED,
             payload: {
