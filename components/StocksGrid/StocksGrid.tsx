@@ -132,8 +132,8 @@ export const StocksGrid: React.FunctionComponent = () => {
               }}
             />
           </Col>
-          <Col>
-            <Form.Group className="mb-3">
+          <Col sm={5} md={4} lg={3}>
+            <Form.Group className="mb-3 d-flex flex-column">
               <Form.Label htmlFor="sort-by-toggle">
                 Sort by market cap:
               </Form.Label>
