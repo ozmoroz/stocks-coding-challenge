@@ -4,7 +4,7 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import MARKETS from '../../markets.json';
 import { Dropdown, DropdownContent, DropdownItem } from './styles';
 
-interface Props {
+export interface Props {
   selectedCountry?: string;
   onChange?: (country: string) => void;
 }
