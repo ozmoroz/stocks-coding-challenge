@@ -1,13 +1,5 @@
-import { useState } from 'react';
-import { useCombobox } from 'downshift';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Autocomplete, TextField } from '@mui/material';
 import MARKETS from '../../markets.json';
-import {
-  Dropdown,
-  DropdownButton,
-  DropdownContent,
-  DropdownItem,
-} from './styles';
 
 export interface Props {
   selectedCountry?: string;
@@ -21,81 +13,32 @@ export interface Market {
   href: string; //"/stocks/au/market-cap-large"
 }
 
+/** Get the slected market by the country name */
+const getSelectedmarket = (
+  selectedCountry: string | undefined
+): Market | undefined => {
+  if (!selectedCountry) return undefined;
+  return (MARKETS as Market[]).find((item) => item.option === selectedCountry);
+};
+
 export const MarketsDropdown: React.FunctionComponent<Props> = ({
   selectedCountry,
   onChange,
 }) => {
-  {
-    const [inputItems, setInputItems] = useState<Market[]>(MARKETS);
-
-    // Pre-select the country passed in props
-    const initialSelecteditem = inputItems.find(
-      (market) => market.option === selectedCountry
-    );
-
-    const itemToString = (item: Market): string => item.label;
-    const {
-      isOpen,
-      getToggleButtonProps,
-      getLabelProps,
-      getMenuProps,
-      getInputProps,
-      getComboboxProps,
-      highlightedIndex,
-      getItemProps,
-    } = useCombobox({
-      items: inputItems,
-      itemToString,
-      initialSelectedItem: initialSelecteditem,
-      initialInputValue: initialSelecteditem?.label,
-      // Pre-select the country passed in props
-      onInputValueChange: ({ inputValue }) => {
-        setInputItems(
-          (MARKETS as Market[]).filter((item) =>
-            item.label.toLowerCase().startsWith(inputValue.toLowerCase())
-          )
-        );
-      },
-      onSelectedItemChange: ({ selectedItem }) => {
-        if (onChange && selectedItem) onChange(selectedItem.option);
-      },
-    });
-    return (
-      <Dropdown>
-        <Form.Group className="mb-3">
-          <div {...getComboboxProps()}>
-            <Form.Label htmlFor="country-dropdown" {...getLabelProps()}>
-              Choose a market:
-            </Form.Label>
-            <InputGroup>
-              <Form.Control
-                id="country-dropdown"
-                type="text"
-                {...getInputProps()}
-              />
-              <DropdownButton
-                variant="outline-secondary"
-                id="button-addon2"
-                {...getToggleButtonProps()}
-                aria-label="toggle menu">
-                &#8595;
-              </DropdownButton>
-            </InputGroup>
-
-            <DropdownContent {...getMenuProps()}>
-              {isOpen &&
-                inputItems.map((item, index) => (
-                  <DropdownItem
-                    isHighlighted={highlightedIndex === index}
-                    key={item.option}
-                    {...getItemProps({ item, index })}>
-                    {item.label}
-                  </DropdownItem>
-                ))}
-            </DropdownContent>
-          </div>
-        </Form.Group>
-      </Dropdown>
-    );
-  }
+  const selectedMarket = getSelectedmarket(selectedCountry);
+  return (
+    <Autocomplete
+      clearOnEscape
+      disablePortal
+      options={MARKETS}
+      renderInput={(params) => (
+        <TextField {...params} label="Choose a market:" />
+      )}
+      sx={{ display: 'flex', flex: '1 1 auto' }}
+      value={selectedMarket}
+      onChange={(_, value) => {
+        if (onChange && value?.option) onChange(value.option);
+      }}
+    />
+  );
 };

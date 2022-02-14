@@ -43,9 +43,9 @@ describe('StocksGrid', () => {
       expect(await screen.findByText('NYSE:JPM')).toBeInTheDocument();
     });
 
-    test('changing country fires fetch request for the new country', () => {
+    test.only('changing country fires fetch request for the new country', () => {
       render(<StocksGrid />);
-      userEvent.click(screen.getByRole('button', { name: 'toggle menu' }));
+      userEvent.click(screen.getByRole('button', { name: 'Open' }));
       userEvent.click(screen.getByRole('option', { name: 'United States' }));
       expect(fetchMock.mock.calls.length).toEqual(2);
       const rules = getRulesFromResponse(fetchMock.mock.calls[1][1].body);
