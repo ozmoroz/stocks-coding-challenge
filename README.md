@@ -6,8 +6,7 @@ The goal of this project is to accomplish the coding challenge using as few comp
 That is why it has no data fetching libraries, such as [react-query](https://react-query.tanstack.com/),
 no state management libraries ([redux](https://redux.js.org/), [recoil](https://recoiljs.org/), etc.),
 no design systems like [MUI](https://mui.com/).
-I used some light [Bootstrap](https://getbootstrap.com/) to make the UI look less ugly.
-I am not a huge fan of Bootstrap, but it is pretty convenient for quick UI prototyping.
+I used [MUI](https://mui.com/) components to make the UI look less ugly.
 
 The project is bootstrapped with [Next.js](https://nextjs.org/). It is the easiest way I know to get a fully-functional
 React application template with pre-configured Typescript, ESLint, Webpack, and even server-side rendering.

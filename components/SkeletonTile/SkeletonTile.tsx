@@ -1,5 +1,4 @@
 import React from 'react';
-import { Stack } from 'react-bootstrap';
 import { StyledContentLoader } from './styles';
 
 /** Skeleton animation tile.
