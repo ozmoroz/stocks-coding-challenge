@@ -10,7 +10,10 @@ import { StocksGrid } from './StocksGrid';
 enableFetchMocks();
 
 /** Return "rules" part of the API request body */
-function getRulesFromResponse(body: BodyInit): unknown[] {
+function getRulesFromResponse(body: BodyInit | null | undefined): unknown[] {
+  if (!body) {
+    return [];
+  }
   const requestBody = JSON.parse(body.toString());
   return JSON.parse(requestBody.rules);
 }
@@ -43,12 +46,12 @@ describe('StocksGrid', () => {
       expect(await screen.findByText('NYSE:JPM')).toBeInTheDocument();
     });
 
-    test.only('changing country fires fetch request for the new country', () => {
+    test('changing country fires fetch request for the new country', () => {
       render(<StocksGrid />);
       userEvent.click(screen.getByRole('button', { name: 'Open' }));
       userEvent.click(screen.getByRole('option', { name: 'United States' }));
       expect(fetchMock.mock.calls.length).toEqual(2);
-      const rules = getRulesFromResponse(fetchMock.mock.calls[1][1].body);
+      const rules = getRulesFromResponse(fetchMock.mock.calls[1][1]?.body);
       expect(rules).toEqual([
         ['order_by', 'market_cap', 'desc'],
         ['grid_visible_flag', '=', true],
@@ -63,7 +66,7 @@ describe('StocksGrid', () => {
       render(<StocksGrid />);
       userEvent.click(screen.getByRole('radio', { name: 'Ascending' }));
       expect(fetchMock.mock.calls.length).toEqual(2);
-      const rules = getRulesFromResponse(fetchMock.mock.calls[1][1].body);
+      const rules = getRulesFromResponse(fetchMock.mock.calls[1][1]?.body);
       expect(rules[0][2]).toEqual('asc');
     });
 
@@ -73,7 +76,7 @@ describe('StocksGrid', () => {
         await screen.findByRole('button', { name: 'Load more...' })
       );
       expect(fetchMock.mock.calls.length).toEqual(2);
-      const body = fetchMock.mock.calls[1][1].body;
+      const body = fetchMock.mock.calls[1][1]?.body;
       expect(JSON.parse(body.toString()).offset).toEqual(STOCKS_PER_PAGE);
     });
   });

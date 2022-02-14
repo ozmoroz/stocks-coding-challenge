@@ -1,15 +1,15 @@
 import React, { useEffect, useReducer } from 'react';
 import {
   Alert,
+  Box,
   Button,
-  Col,
-  Container,
-  Form,
-  Row,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
   Stack,
-  ToggleButtonGroup,
-  ToggleButton,
-} from 'react-bootstrap';
+} from '@mui/material';
 import { ApiResponse } from 'interfaces/ApiResponse';
 import { StockData } from 'interfaces/StockData';
 import { initialState, STOCKS_PER_PAGE } from './state';
@@ -93,18 +93,18 @@ export const StocksGrid: React.FunctionComponent = () => {
         Besides, most likely it has no value to the user.
         We show a generic error message but log the real one.
       */
-      return <Alert variant="danger">An error has occurred.</Alert>;
+      return <Alert severity="error">An error has occurred.</Alert>;
       // No stocks were found for this country - show an info message
     } else if (!state.isFetching && state.stocks.length === 0) {
       return (
-        <Alert variant="info">No stocks found for the selected market.</Alert>
+        <Alert severity="info">No stocks found for the selected market.</Alert>
       );
       // Show the list of stocks
     } else {
       return (
-        <Stack gap={3}>
+        <Stack spacing={1}>
           {state.stocks.map((stock) => (
-            <StockTile key={stock.id} data={stock} />
+            <StockTile key={stock.company_id} data={stock} />
           ))}
           {/* If data fetching is in progress, show skeleton animations for the tiles being loaded */}
           {state.isFetching &&
@@ -117,56 +117,63 @@ export const StocksGrid: React.FunctionComponent = () => {
   };
 
   return (
-    <Container>
-      <Form>
-        <Row>
-          <Col sm={5} md={4} lg={3}>
-            <MarketsDropdown
-              selectedCountry={state.country}
-              onChange={(country) => {
-                if (country)
-                  dispatch({
-                    type: ActionType.CHANGE_COUNTRY,
-                    payload: country,
-                  });
-              }}
-            />
-          </Col>
-          <Col sm={5} md={4} lg={3}>
-            <Form.Group className="mb-3 d-flex flex-column">
-              <Form.Label htmlFor="sort-by-toggle">
-                Sort by market cap:
-              </Form.Label>
-              <ToggleButtonGroup
-                id="sort-by-toggle"
-                type="radio"
+    <Box sx={{ display: 'flex', flexDirection: 'column', my: 2 }}>
+      <Box
+        component="form"
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          mx: -0.5,
+          py: 1,
+        }}>
+        <Box sx={{ display: 'flex', flex: '1 0 300px', m: 0.5 }}>
+          <MarketsDropdown
+            selectedCountry={state.country}
+            onChange={(country) => {
+              if (country)
+                dispatch({
+                  type: ActionType.CHANGE_COUNTRY,
+                  payload: country,
+                });
+            }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', flex: '1 0 300px', m: 0.5 }}>
+          <Box sx={{ display: 'flex' }}>
+            <FormControl>
+              <FormLabel id="sort-by-toggle">Sort by market cap:</FormLabel>
+              <RadioGroup
+                row
                 name="sort-order"
+                aria-labelledby="sort-by-toggle"
                 value={[state.orderBy]}
-                onChange={(order) => {
-                  handleOrderChanged(order as 'asc' | 'desc');
+                onChange={(ev, value) => {
+                  handleOrderChanged(value as 'asc' | 'desc');
                 }}>
-                <ToggleButton id="order-desc" value="desc">
-                  Descending
-                </ToggleButton>
-                <ToggleButton id="order-asc" value="asc">
-                  Ascending
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Form.Group>
-          </Col>
-        </Row>
-      </Form>
+                <FormControlLabel
+                  value="desc"
+                  control={<Radio />}
+                  label="Descending"
+                />
+                <FormControlLabel
+                  value="asc"
+                  control={<Radio />}
+                  label="Ascending"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
+        </Box>
+      </Box>
       {renderStockList()}
       {/* Show Load more button if there are more stocks to load */}
       {state.stocks.length < state.totalRecords && (
-        <Row>
-          <Col className="d-flex justify-content-center my-2">
-            <Button variant="primary" onClick={handleLoadMore}>
-              Load more...
-            </Button>
-          </Col>
-        </Row>
+        <Box sx={{ display: 'flex', my: 2 }}>
+          <Button variant="contained" onClick={handleLoadMore}>
+            Load more...
+          </Button>
+        </Box>
       )}
-    </Container>
+    </Box>
   );
 };
