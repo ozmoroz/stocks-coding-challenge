@@ -1,12 +1,19 @@
 import { STOCKS_PER_PAGE } from './state';
-import { ActionType, reducer } from './reducer';
+import {
+  ChangeCountryAction,
+  ChangeOrderAction,
+  FetchCompletedAction,
+  FetchFailedAction,
+  FetchStartedAction,
+  LoadMoreAction,
+  reducer,
+} from './reducer';
 import { State } from './state';
 import { STOCKS } from 'mocks/stocks.mock';
-import { ApiResponse } from 'interfaces/ApiResponse';
 
 describe('StocksGrid reducer', () => {
   it('LOAD_MORE action', () => {
-    const action = { type: ActionType.LOAD_MORE };
+    const action = new LoadMoreAction();
     const state: State = {
       country: 'us',
       offset: 0,
@@ -29,7 +36,7 @@ describe('StocksGrid reducer', () => {
   });
 
   it('FETCH_STARTED action', () => {
-    const action = { type: ActionType.FETCH_STARTED };
+    const action = new FetchStartedAction();
     const state: State = {
       country: 'us',
       offset: 12,
@@ -52,7 +59,7 @@ describe('StocksGrid reducer', () => {
   });
 
   it('CHANGE_COUNTRY action', () => {
-    const action = { type: ActionType.CHANGE_COUNTRY, payload: 'au' };
+    const action = new ChangeCountryAction('au');
     const state: State = {
       country: 'us',
       offset: 12,
@@ -75,7 +82,7 @@ describe('StocksGrid reducer', () => {
   });
 
   it('CHANGE_ORDER action', () => {
-    const action = { type: ActionType.CHANGE_ORDER, payload: 'asc' };
+    const action = new ChangeOrderAction('asc');
     const state: State = {
       country: 'us',
       offset: 12,
@@ -102,7 +109,7 @@ describe('StocksGrid reducer', () => {
       stocks: STOCKS,
       totalRecords: 192,
     };
-    const action = { type: ActionType.FETCH_COMPLETED, payload };
+    const action = new FetchCompletedAction(payload);
 
     const state: State = {
       country: 'us',
@@ -127,10 +134,7 @@ describe('StocksGrid reducer', () => {
 
   it('FETCH_FAILED action', () => {
     const error: Error = new Error('Failed to fetch stocks');
-    const action = {
-      type: ActionType.FETCH_FAILED,
-      payload: error,
-    };
+    const action = new FetchFailedAction(error);
 
     const state: State = {
       country: 'us',

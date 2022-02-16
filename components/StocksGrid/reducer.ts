@@ -1,5 +1,5 @@
 import { StockData } from 'interfaces/StockData';
-import { STOCKS_PER_PAGE, State } from './state';
+import { STOCKS_PER_PAGE, SortOrder, State } from './state';
 
 /** All possible action types */
 export enum ActionType {
@@ -18,7 +18,7 @@ export enum ActionType {
 }
 
 /** A base class for all action types */
-interface BaseAction<T> {
+class BaseAction<T> {
   type: ActionType;
   payload?: T;
 }
@@ -32,17 +32,56 @@ interface FetchCompletedPayload {
 }
 
 /** An action type to load more stocks. Does not contain a payload */
-type LoadMoreAction = BaseAction<void>;
+export class LoadMoreAction implements BaseAction<void> {
+  type: ActionType.LOAD_MORE;
+  constructor() {
+    this.type = ActionType.LOAD_MORE;
+  }
+}
+
 /** An action to change the market (country). Contains a country code as a payload  */
-type ChangeCountryAction = BaseAction<string>;
+export class ChangeCountryAction implements BaseAction<string> {
+  type: ActionType.CHANGE_COUNTRY;
+  constructor(public payload: string) {
+    this.type = ActionType.CHANGE_COUNTRY;
+    this.payload = payload;
+  }
+}
+
 /** An action to change the sort order. Payload is asc(ending) or desc(ending) */
-type ChangeOrderAction = BaseAction<'asc' | 'desc'>;
+export class ChangeOrderAction implements BaseAction<SortOrder> {
+  type: ActionType.CHANGE_ORDER;
+  constructor(public payload: SortOrder) {
+    this.type = ActionType.CHANGE_ORDER;
+    this.payload = payload;
+  }
+}
+
 /** An action to that fires when stock fetching from the API is started */
-type FetchStartedAction = BaseAction<void>;
+export class FetchStartedAction implements BaseAction<void> {
+  type: ActionType.FETCH_STARTED;
+  constructor() {
+    this.type = ActionType.FETCH_STARTED;
+  }
+}
+
 /** An action to that fires when stock fetching from the API resulted in an error */
-type FetchFailedAction = BaseAction<Error>;
+export class FetchFailedAction implements BaseAction<Error> {
+  type: ActionType = ActionType.FETCH_FAILED;
+  constructor(public payload: Error) {
+    this.type = ActionType.FETCH_FAILED;
+    this.payload = payload;
+  }
+}
+
 /** An action to that fires when stock fetching from the API is completed */
-type FetchCompletedAction = BaseAction<FetchCompletedPayload>;
+export class FetchCompletedAction implements BaseAction<FetchCompletedPayload> {
+  type: ActionType.FETCH_COMPLETED;
+  constructor(public payload: FetchCompletedPayload) {
+    this.type = ActionType.FETCH_COMPLETED;
+    this.payload = payload;
+  }
+}
 
 /** Common type for all of our actions */
 type Action =
@@ -153,5 +192,6 @@ export function reducer(state: State, action: Action): State {
   } else {
     // We should use some kind of structured server logging here instead of console logging.
     console.error('Unknown action: ' + action);
+    return state;
   }
 }

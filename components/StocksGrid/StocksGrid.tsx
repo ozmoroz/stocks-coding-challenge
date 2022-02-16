@@ -12,8 +12,16 @@ import {
 } from '@mui/material';
 import { ApiResponse } from 'interfaces/ApiResponse';
 import { StockData } from 'interfaces/StockData';
-import { initialState, STOCKS_PER_PAGE } from './state';
-import { ActionType, reducer } from './reducer';
+import { initialState, SortOrder, STOCKS_PER_PAGE } from './state';
+import {
+  ActionType,
+  ChangeOrderAction,
+  FetchCompletedAction,
+  FetchFailedAction,
+  FetchStartedAction,
+  LoadMoreAction,
+  reducer,
+} from './reducer';
 import { MarketsDropdown } from 'components/MarketsDropdown';
 import { StockTile } from 'components/StockTile';
 import { SkeletonTile } from 'components/SkeletonTile';
@@ -26,7 +34,7 @@ export const StocksGrid: React.FunctionComponent = () => {
    */
   useEffect(
     () => {
-      dispatch({ type: ActionType.FETCH_STARTED });
+      dispatch(new FetchStartedAction());
       fetch('https://api.simplywall.st/api/grid/filter?include=info,score', {
         method: 'POST',
         headers: {
@@ -50,16 +58,15 @@ export const StocksGrid: React.FunctionComponent = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          dispatch({
-            type: ActionType.FETCH_COMPLETED,
-            payload: {
+          dispatch(
+            new FetchCompletedAction({
               stocks: (data as ApiResponse).data as StockData[],
               totalRecords: (data as ApiResponse).meta.total_records,
-            },
-          });
+            })
+          );
         })
         .catch((err) => {
-          dispatch({ type: ActionType.FETCH_FAILED, payload: err });
+          dispatch(new FetchFailedAction(err));
           // Ideally we should log the error to some kind of structured server-side logging engine
           // rather than logging the error to the console
           console.log(err);
@@ -73,15 +80,12 @@ export const StocksGrid: React.FunctionComponent = () => {
 
   /** Hanle "Load More" button click */
   const handleLoadMore = () => {
-    dispatch({ type: ActionType.LOAD_MORE });
+    dispatch(new LoadMoreAction());
   };
 
   /** Hanlde selecting the market cap stock sort order */
   const handleOrderChanged = (order: typeof state.orderBy) => {
-    dispatch({
-      type: ActionType.CHANGE_ORDER,
-      payload: order,
-    });
+    dispatch(new ChangeOrderAction(order));
   };
 
   /** Render an error message, stock tiles, loading skeleton tiles, or no stocks found messge. */
@@ -148,7 +152,7 @@ export const StocksGrid: React.FunctionComponent = () => {
                 aria-labelledby="sort-by-toggle"
                 value={[state.orderBy]}
                 onChange={(ev, value) => {
-                  handleOrderChanged(value as 'asc' | 'desc');
+                  handleOrderChanged(value as SortOrder);
                 }}>
                 <FormControlLabel
                   value="desc"
