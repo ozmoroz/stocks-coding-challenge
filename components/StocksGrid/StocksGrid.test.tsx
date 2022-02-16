@@ -9,8 +9,13 @@ import { StocksGrid } from './StocksGrid';
 
 enableFetchMocks();
 
+/** Type of rules field returned by the API
+ * We don't control the API, therefore we don't know the exact type it returns.
+ * We resort to `unknown` type for the lack of a better option. */
+type Rules = unknown[][];
+
 /** Return "rules" part of the API request body */
-function getRulesFromResponse(body: BodyInit | null | undefined): unknown[] {
+function getRulesFromResponse(body: BodyInit | null | undefined): Rules {
   if (!body) {
     return [];
   }
@@ -77,7 +82,9 @@ describe('StocksGrid', () => {
       );
       expect(fetchMock.mock.calls.length).toEqual(2);
       const body = fetchMock.mock.calls[1][1]?.body;
-      expect(JSON.parse(body.toString()).offset).toEqual(STOCKS_PER_PAGE);
+      expect(body).toBeDefined();
+      expect(body).not.toBeNull();
+      expect(JSON.parse(body!.toString()).offset).toEqual(STOCKS_PER_PAGE);
     });
   });
 
