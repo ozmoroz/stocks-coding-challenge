@@ -25,6 +25,15 @@ Rather, it is a showcase of my development and testing practices. There are a fe
 - The test coverage is far from complete.
 - Only the most essential accessibility practices and checks are applied.
 
+## How to use:
+
+1. Clone out this project in git: `git clone https://github.com/ozmoroz/stocks-coding-challenge.git`.
+2. [Install yarn](https://yarnpkg.com/getting-started/install).
+3. Change into the project directory.
+4. `yarn install` to install the dependencies.
+5. `yarn test` to run the unit tests.
+6. `yarn dev` to run the development server on https://localhost:3000
+
 ## Requirements:
 
 - Show a list of companies presented in a tile
